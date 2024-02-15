@@ -11,16 +11,13 @@ class Car {
   maxSpeed: number = 3;
   friction: number = 0.05;
   angle: number = 0;
-
-  controls: Controls;
+  controls: Controls = new Controls();
 
   constructor(x: number, y: number, width: number, height: number) {
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
-
-    this.controls = new Controls();
   }
 
   update() {
