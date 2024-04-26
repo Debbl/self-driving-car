@@ -10,10 +10,10 @@ class Controls {
     this.left = false;
     this.right = false;
 
-    this.#addKeyboardListeners();
+    this.addKeyboardListeners();
   }
 
-  #addKeyboardListeners() {
+  private addKeyboardListeners() {
     window.addEventListener("keydown", (e) => {
       switch (e.key) {
         case "ArrowLeft":
