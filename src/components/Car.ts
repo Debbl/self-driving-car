@@ -1,6 +1,6 @@
+import type { Line } from "../types";
 import { Controls } from "./Controls";
 import { Sensor } from "./Sensor";
-import type { Line } from "./types";
 
 class Car {
   x: number;

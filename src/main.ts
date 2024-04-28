@@ -1,6 +1,6 @@
-import { Car } from "./Car";
-import { Road } from "./Road";
-import "./style.css";
+import { Car } from "./components/Car";
+import { Road } from "./components/Road";
+import "./styles/index.css";
 
 const canvas = document.querySelector("#myCanvas") as HTMLCanvasElement;
 

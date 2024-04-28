@@ -1,5 +1,5 @@
-import { lerp } from "./utils";
-import type { Position } from "./types";
+import { lerp } from "../utils";
+import type { Position } from "../types";
 
 class Road {
   x: number;

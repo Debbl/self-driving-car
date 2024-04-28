@@ -1,5 +1,5 @@
-import { getIntersection, lerp } from "./utils";
-import type { Line, Ray, Reading } from "./types";
+import { getIntersection, lerp } from "../utils";
+import type { Line, Ray, Reading } from "../types";
 import type { Car } from "./Car";
 
 class Sensor {
