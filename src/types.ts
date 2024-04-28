@@ -12,3 +12,5 @@ export interface Reading {
   y: number;
   offset: number;
 }
+
+export type Polygon = [Position, Position, Position, Position];

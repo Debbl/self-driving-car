@@ -1,4 +1,4 @@
-import type { Position, Reading } from "./types";
+import type { Line, Polygon, Position, Reading } from "./types";
 
 export function lerp(A: number, B: number, t: number) {
   return A + (B - A) * t;
@@ -28,4 +28,21 @@ export function getIntersection(
   }
 
   return null;
+}
+
+export function polysIntersect(poly1: Polygon, poly2: Line) {
+  for (let i = 0; i < poly1.length; i++) {
+    for (let j = 0; j < poly2.length; j++) {
+      const touch = getIntersection(
+        poly1[i],
+        poly1[(i + 1) % poly1.length],
+        poly2[j],
+        poly2[(j + 1) % poly2.length],
+      );
+      if (touch) {
+        return true;
+      }
+    }
+  }
+  return false;
 }
