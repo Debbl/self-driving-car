@@ -8,7 +8,7 @@ class Sensor {
   rayLength: number;
   raySpread: number;
   rays: Ray[] = [];
-  readings: Reading[] = [];
+  readings: (Reading | undefined)[] = [];
 
   constructor(car: Car) {
     this.car = car;
@@ -41,7 +41,7 @@ class Sensor {
     }
   }
 
-  private getReading(ray: Ray, roadBorders: Line[]) {
+  private getReading(ray: Ray, roadBorders: Line[]): Reading | undefined {
     const touches: Reading[] = [];
 
     for (let i = 0; i < roadBorders.length; i++) {
@@ -57,9 +57,7 @@ class Sensor {
       }
     }
 
-    if (touches.length === 0) {
-      return null;
-    } else {
+    if (touches.length !== 0) {
       const offsets = touches.map((e) => e.offset);
       const minOffset = Math.min(...offsets);
 
@@ -74,7 +72,7 @@ class Sensor {
 
     for (let i = 0; i < this.rays.length; i++) {
       const reading = this.getReading(this.rays[i], roadBorders);
-      if (reading) this.readings.push(reading);
+      this.readings.push(reading);
     }
   }
 
@@ -84,7 +82,7 @@ class Sensor {
     for (let i = 0; i < this.rayCount; i++) {
       let end = this.rays[i][1];
       if (this.readings[i]) {
-        end = this.readings[i];
+        end = this.readings[i]!;
       }
 
       ctx.beginPath();
