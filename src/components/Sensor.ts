@@ -1,5 +1,5 @@
 import { getIntersection, lerp } from "../utils";
-import type { Line, Ray, Reading } from "../types";
+import type { Line, Ray, Reading, Traffic } from "../types";
 import type { Car } from "./Car";
 
 class Sensor {
@@ -41,19 +41,34 @@ class Sensor {
     }
   }
 
-  private getReading(ray: Ray, roadBorders: Line[]): Reading | undefined {
+  private getReading(
+    ray: Ray,
+    roadBorders: Line[],
+    traffic: Traffic,
+  ): Reading | undefined {
     const touches: Reading[] = [];
 
-    for (let i = 0; i < roadBorders.length; i++) {
+    for (const roadBorder of roadBorders) {
       const touch = getIntersection(
         ray[0],
         ray[1],
-        roadBorders[i][0],
-        roadBorders[i][1],
+        roadBorder[0],
+        roadBorder[1],
       );
 
-      if (touch) {
-        touches.push(touch);
+      if (touch) touches.push(touch);
+    }
+
+    for (const { polygon } of traffic) {
+      for (const poly of polygon) {
+        const value = getIntersection(
+          ray[0],
+          ray[1],
+          poly,
+          polygon[(polygon.indexOf(poly) + 1) % polygon.length],
+        );
+
+        if (value) touches.push(value);
       }
     }
 
@@ -65,13 +80,13 @@ class Sensor {
     }
   }
 
-  update(roadBorders: Line[]) {
+  update(roadBorders: Line[], traffic: Traffic) {
     this.castRays();
 
     this.readings = [];
 
     for (let i = 0; i < this.rays.length; i++) {
-      const reading = this.getReading(this.rays[i], roadBorders);
+      const reading = this.getReading(this.rays[i], roadBorders, traffic);
       this.readings.push(reading);
     }
   }

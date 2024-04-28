@@ -1,3 +1,5 @@
+import type { Car } from "./components/Car";
+
 export interface Position {
   x: number;
   y: number;
@@ -13,4 +15,6 @@ export interface Reading {
   offset: number;
 }
 
-export type Polygon = [Position, Position, Position, Position];
+export type Polygon = Position[];
+
+export type Traffic = Car[];
