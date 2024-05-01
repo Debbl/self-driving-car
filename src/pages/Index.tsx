@@ -8,6 +8,7 @@ import {
   GravityUiCircles5Random,
   MaterialSymbolsDeleteOutline,
   MaterialSymbolsStopCircle,
+  MdiGithub,
   RiSave3Fill,
   TablerBulbFilled,
 } from "~/icons";
@@ -147,6 +148,14 @@ function Index() {
     <div className="flex size-full justify-center gap-x-4 bg-gray-100">
       <canvas ref={canvasRef} className="bg-gray-400" />
       <div className="flex flex-col justify-center gap-y-4">
+        <a
+          href="https://github.com/Debbl/self-driving-car"
+          target="_blank"
+          className="flex size-8 items-center justify-center rounded-md hover:bg-blue-300"
+          rel="noreferrer"
+        >
+          <MdiGithub />
+        </a>
         <button
           className="flex size-8 items-center justify-center rounded-md hover:bg-blue-300"
           onClick={() => addBest()}
