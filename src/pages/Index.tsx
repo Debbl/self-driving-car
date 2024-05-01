@@ -11,7 +11,7 @@ import {
 } from "~/icons";
 import { getRandomColor } from "~/utils";
 
-const N = 10;
+const N = 30;
 
 function generateCars(N: number, road: Road) {
   const cars = [];
@@ -101,6 +101,10 @@ function Index() {
       traffic.forEach((car) => {
         if (isRunning.current) car.update(road.borders, []);
       });
+
+      cars.current = cars.current.filter(
+        (car) => !car.damaged && Math.abs(car.y - bestCar.current!.y) < 500,
+      );
 
       cars.current.forEach((car) => {
         if (isRunning.current) car.update(road.borders, traffic);
