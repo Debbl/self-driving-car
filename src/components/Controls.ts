@@ -1,4 +1,4 @@
-export type ControlType = "KEYS" | "DUMMY";
+export type ControlType = "KEYS" | "DUMMY" | "AI";
 
 class Controls {
   forward: boolean;

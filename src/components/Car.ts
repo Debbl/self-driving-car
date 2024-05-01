@@ -1,6 +1,7 @@
 import type { Line, Polygon, Traffic } from "../types";
 import type { ControlType } from "./Controls";
 import { Controls } from "./Controls";
+import { NeuralNetwork } from "./Network";
 import { Sensor } from "./Sensor";
 import { polysIntersect } from "~/utils";
 
@@ -17,10 +18,11 @@ class Car {
   maxSpeed: number;
   angle = 0;
   damaged = false;
-  controlType: "KEYS" | "DUMMY" = "KEYS";
+  controlType: ControlType = "KEYS";
 
   controls: Controls;
   sensor?: Sensor;
+  brain?: NeuralNetwork;
 
   constructor(
     x: number,
@@ -37,8 +39,12 @@ class Car {
     this.controlType = controlType;
     this.maxSpeed = maxSpeed;
 
-    if (this.controlType === "KEYS") {
+    if (this.controlType === "KEYS" || this.controlType === "AI") {
       this.sensor = new Sensor(this);
+
+      if (this.controlType === "AI") {
+        this.brain = new NeuralNetwork([this.sensor.rayCount, 6, 4]);
+      }
     }
     this.controls = new Controls(controlType);
   }
@@ -130,7 +136,19 @@ class Car {
       this.polygon = this.createPolygon();
       this.damaged = this.assessDamage(roadBorders, traffic);
     }
-    this.sensor?.update(roadBorders, traffic);
+    if (this.sensor) {
+      this.sensor.update(roadBorders, traffic);
+
+      const offsets = this.sensor.readings.map((s) => (!s ? 0 : 1 - s.offset));
+
+      if (this.brain) {
+        const outputs = NeuralNetwork.feedForward(offsets, this.brain);
+        this.controls.forward = !!outputs[0];
+        this.controls.left = !!outputs[1];
+        this.controls.right = !!outputs[2];
+        this.controls.reverse = !!outputs[3];
+      }
+    }
   }
 
   draw(ctx: CanvasRenderingContext2D, fillStyle: string = "black") {
