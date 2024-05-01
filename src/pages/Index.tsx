@@ -8,6 +8,7 @@ import {
   MaterialSymbolsStopCircle,
   RiSave3Fill,
 } from "~/icons";
+import { getRandomColor } from "~/utils";
 
 const N = 10;
 
@@ -54,15 +55,19 @@ function Index() {
 
     const road = new Road(canvas.width / 2, canvas.width * 0.9);
 
-    const traffic = [
-      new Car(road.getLaneCenter(1), -100, 30, 50, "DUMMY", 2),
-      new Car(road.getLaneCenter(0), -300, 30, 50, "DUMMY", 2),
-      new Car(road.getLaneCenter(2), -300, 30, 50, "DUMMY", 2),
-      new Car(road.getLaneCenter(0), -500, 30, 50, "DUMMY", 2),
-      new Car(road.getLaneCenter(1), -500, 30, 50, "DUMMY", 2),
-      new Car(road.getLaneCenter(1), -700, 30, 50, "DUMMY", 2),
-      new Car(road.getLaneCenter(2), -700, 30, 50, "DUMMY", 2),
-    ];
+    const traffic = Array.from(
+      { length: 7 },
+      (_, i) =>
+        new Car(
+          road.getLaneCenter(i % road.laneCount),
+          -100 * (i + 1),
+          30,
+          50,
+          "DUMMY",
+          2,
+          getRandomColor(),
+        ),
+    );
 
     const cars = generateCars(N, road);
     bestCar.current = cars[0];
@@ -99,13 +104,13 @@ function Index() {
 
       road.draw(ctx);
 
-      traffic.forEach((car) => car.draw(ctx, "blue"));
+      traffic.forEach((car) => car.draw(ctx));
 
       ctx.globalAlpha = 0.2;
-      cars.forEach((car) => car.draw(ctx, "black", false));
+      cars.forEach((car) => car.draw(ctx, false));
 
       ctx.globalAlpha = 1;
-      bestCar.current.draw(ctx, "green", true);
+      bestCar.current.draw(ctx, true);
 
       ctx.restore();
 

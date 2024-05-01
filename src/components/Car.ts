@@ -4,6 +4,7 @@ import { Controls } from "./Controls";
 import { NeuralNetwork } from "./Network";
 import { Sensor } from "./Sensor";
 import { polysIntersect } from "~/utils";
+import CarImage from "~/assets/car.png";
 
 class Car {
   x: number;
@@ -23,6 +24,8 @@ class Car {
   controls: Controls;
   sensor?: Sensor;
   brain?: NeuralNetwork;
+  img: HTMLImageElement;
+  mask: HTMLCanvasElement;
 
   constructor(
     x: number,
@@ -31,6 +34,7 @@ class Car {
     height: number,
     controlType: ControlType = "KEYS",
     maxSpeed = 3,
+    color = "blue",
   ) {
     this.x = x;
     this.y = y;
@@ -47,6 +51,23 @@ class Car {
       }
     }
     this.controls = new Controls(controlType);
+
+    this.img = new Image();
+    this.img.src = CarImage;
+
+    this.mask = document.createElement("canvas");
+    this.mask.width = width;
+    this.mask.height = height;
+
+    const maskCtx = this.mask.getContext("2d")!;
+    this.img.onload = () => {
+      maskCtx.fillStyle = color;
+      maskCtx.rect(0, 0, this.width, this.height);
+      maskCtx.fill();
+
+      maskCtx.globalCompositeOperation = "destination-atop";
+      maskCtx.drawImage(this.img, 0, 0, this.width, this.height);
+    };
   }
 
   private move() {
@@ -151,29 +172,24 @@ class Car {
     }
   }
 
-  draw(
-    ctx: CanvasRenderingContext2D,
-    fillStyle: string = "black",
-    drawSensor = true,
-  ) {
-    const { damaged, polygon } = this;
+  draw(ctx: CanvasRenderingContext2D, drawSensor = true) {
+    const { x, y, angle, damaged, sensor, mask, width, height, img } = this;
 
-    if (damaged) {
-      ctx.fillStyle = "gray";
-    } else {
-      ctx.fillStyle = fillStyle;
+    if (sensor && drawSensor) {
+      sensor.draw(ctx);
     }
 
-    ctx.beginPath();
-    ctx.moveTo(polygon[0].x, polygon[0].y);
-    for (const poly of polygon.slice(1)) {
-      ctx.lineTo(poly.x, poly.y);
-    }
-    ctx.fill();
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(-angle);
 
-    if (this.sensor && drawSensor) {
-      this.sensor.draw(ctx);
+    if (!damaged) {
+      ctx.drawImage(mask, -width / 2, -height / 2, width, height);
+      ctx.globalCompositeOperation = "multiply";
     }
+
+    ctx.drawImage(img, -width / 2, -height / 2, width, height);
+    ctx.restore();
   }
 }
 
