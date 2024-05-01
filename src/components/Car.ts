@@ -14,7 +14,7 @@ class Car {
   polygon: Polygon = [];
 
   speed = 0;
-  acceleration = 0.2;
+  acceleration = 0.3;
   friction = 0.05;
   maxSpeed: number;
   angle = 0;

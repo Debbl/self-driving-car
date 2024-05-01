@@ -3,15 +3,17 @@ import { Car } from "~/components/Car";
 import { NeuralNetwork } from "~/components/Network";
 import { Road } from "~/components/Road";
 import { Visualizer } from "~/components/Visualizer";
+import { BEST_NETWORK } from "~/constants";
 import {
   GravityUiCircles5Random,
   MaterialSymbolsDeleteOutline,
   MaterialSymbolsStopCircle,
   RiSave3Fill,
+  TablerBulbFilled,
 } from "~/icons";
 import { getRandomColor } from "~/utils";
 
-const N = 30;
+const N = 100;
 
 function generateCars(N: number, road: Road) {
   const cars = [];
@@ -28,6 +30,11 @@ function Index() {
   const cars = useRef<Car[]>([]);
   const bestCar = useRef<Car>();
   const isRunning = useRef(true);
+
+  function addBest() {
+    localStorage.setItem("bestBrain", JSON.stringify(BEST_NETWORK));
+    location.reload();
+  }
 
   function mutate() {
     cars.current.forEach((car) => {
@@ -69,7 +76,7 @@ function Index() {
       (_, i) =>
         new Car(
           road.getLaneCenter(i % road.laneCount),
-          -100 * (i + 1),
+          -200 * (i + 1),
           30,
           50,
           "DUMMY",
@@ -102,9 +109,10 @@ function Index() {
         if (isRunning.current) car.update(road.borders, []);
       });
 
-      cars.current = cars.current.filter(
-        (car) => !car.damaged && Math.abs(car.y - bestCar.current!.y) < 500,
-      );
+      cars.current = cars.current.filter((car) => {
+        if (car === bestCar.current) return true;
+        return !car.damaged && Math.abs(car.y - bestCar.current!.y) < 500;
+      });
 
       cars.current.forEach((car) => {
         if (isRunning.current) car.update(road.borders, traffic);
@@ -139,6 +147,12 @@ function Index() {
     <div className="flex size-full justify-center gap-x-4 bg-gray-100">
       <canvas ref={canvasRef} className="bg-gray-400" />
       <div className="flex flex-col justify-center gap-y-4">
+        <button
+          className="flex size-8 items-center justify-center rounded-md hover:bg-blue-300"
+          onClick={() => addBest()}
+        >
+          <TablerBulbFilled />
+        </button>
         <button
           className="flex size-8 items-center justify-center rounded-md hover:bg-blue-300"
           onClick={() => mutate()}
