@@ -151,7 +151,11 @@ class Car {
     }
   }
 
-  draw(ctx: CanvasRenderingContext2D, fillStyle: string = "black") {
+  draw(
+    ctx: CanvasRenderingContext2D,
+    fillStyle: string = "black",
+    drawSensor = true,
+  ) {
     const { damaged, polygon } = this;
 
     if (damaged) {
@@ -167,7 +171,9 @@ class Car {
     }
     ctx.fill();
 
-    this.sensor?.draw(ctx);
+    if (this.sensor && drawSensor) {
+      this.sensor.draw(ctx);
+    }
   }
 }
 

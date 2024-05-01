@@ -1,3 +1,5 @@
+import { lerp } from "~/utils";
+
 class NeuralNetwork {
   levels: Level[] = [];
 
@@ -15,6 +17,18 @@ class NeuralNetwork {
     }
 
     return outputs;
+  }
+
+  static mutate(network: NeuralNetwork, amount = 1) {
+    network.levels.forEach((level) => {
+      level.biases = level.biases.map((bias) =>
+        lerp(bias, Math.random() * 2 - 1, amount),
+      );
+
+      level.weights = level.weights.map((weight) =>
+        weight.map((w) => lerp(w, Math.random() * 2 - 1, amount)),
+      );
+    });
   }
 }
 
