@@ -4,6 +4,7 @@ import { NeuralNetwork } from "~/components/Network";
 import { Road } from "~/components/Road";
 import { Visualizer } from "~/components/Visualizer";
 import {
+  GravityUiCircles5Random,
   MaterialSymbolsDeleteOutline,
   MaterialSymbolsStopCircle,
   RiSave3Fill,
@@ -24,8 +25,16 @@ function generateCars(N: number, road: Road) {
 function Index() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const networkCanvasRef = useRef<HTMLCanvasElement>(null);
+  const cars = useRef<Car[]>([]);
   const bestCar = useRef<Car>();
   const isRunning = useRef(true);
+
+  function mutate() {
+    cars.current.forEach((car) => {
+      const isBest = car === bestCar.current;
+      if (!isBest) NeuralNetwork.mutate(car.brain!, 0.1);
+    });
+  }
 
   function toggle() {
     isRunning.current = !isRunning.current;
@@ -69,14 +78,16 @@ function Index() {
         ),
     );
 
-    const cars = generateCars(N, road);
-    bestCar.current = cars[0];
+    cars.current = generateCars(N, road);
+    bestCar.current = cars.current[0];
 
     if (localStorage.getItem("bestBrain")) {
-      for (let i = 0; i < cars.length; i++) {
-        cars[i].brain = JSON.parse(localStorage.getItem("bestBrain") as string);
+      for (let i = 0; i < cars.current.length; i++) {
+        cars.current[i].brain = JSON.parse(
+          localStorage.getItem("bestBrain") as string,
+        );
         if (i !== 0) {
-          NeuralNetwork.mutate(cars[i].brain!, 0.1);
+          NeuralNetwork.mutate(cars.current[i].brain!, 0.1);
         }
       }
     }
@@ -91,12 +102,12 @@ function Index() {
         if (isRunning.current) car.update(road.borders, []);
       });
 
-      cars.forEach((car) => {
+      cars.current.forEach((car) => {
         if (isRunning.current) car.update(road.borders, traffic);
       });
 
-      bestCar.current = cars.find(
-        (c) => c.y === Math.min(...cars.map((c) => c.y)),
+      bestCar.current = cars.current.find(
+        (c) => c.y === Math.min(...cars.current.map((c) => c.y)),
       )!;
 
       ctx.save();
@@ -107,7 +118,7 @@ function Index() {
       traffic.forEach((car) => car.draw(ctx));
 
       ctx.globalAlpha = 0.2;
-      cars.forEach((car) => car.draw(ctx, false));
+      cars.current.forEach((car) => car.draw(ctx, false));
 
       ctx.globalAlpha = 1;
       bestCar.current.draw(ctx, true);
@@ -124,6 +135,12 @@ function Index() {
     <div className="flex size-full justify-center gap-x-4 bg-gray-100">
       <canvas ref={canvasRef} className="bg-gray-400" />
       <div className="flex flex-col justify-center gap-y-4">
+        <button
+          className="flex size-8 items-center justify-center rounded-md hover:bg-blue-300"
+          onClick={() => mutate()}
+        >
+          <GravityUiCircles5Random />
+        </button>
         <button
           className="flex size-8 items-center justify-center rounded-md hover:bg-blue-300"
           onClick={() => toggle()}
