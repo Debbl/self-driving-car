@@ -31,6 +31,7 @@ function Index() {
   const cars = useRef<Car[]>([]);
   const bestCar = useRef<Car>();
   const isRunning = useRef(true);
+  const requestId = useRef<number | null>(null);
 
   function addBest() {
     localStorage.setItem("bestBrain", JSON.stringify(BEST_NETWORK));
@@ -100,8 +101,6 @@ function Index() {
       }
     }
 
-    animate();
-
     function animate(time = 0) {
       canvas.height = window.innerHeight;
       networkCanvas.height = window.innerHeight;
@@ -140,8 +139,14 @@ function Index() {
 
       networkCtx.lineDashOffset = -time / 50;
       Visualizer.drawNetwork(networkCtx, bestCar.current.brain!);
-      requestAnimationFrame(animate);
+      requestId.current = requestAnimationFrame(animate);
     }
+
+    requestId.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (requestId.current) cancelAnimationFrame(requestId.current);
+    };
   }, []);
 
   return (
