@@ -1,9 +1,10 @@
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { Car } from "~/components/Car";
 import { NeuralNetwork } from "~/components/Network";
 import { Road } from "~/components/Road";
 import { Visualizer } from "~/components/Visualizer";
 import { BEST_NETWORK } from "~/constants";
+import { useRequestAnimationFrame } from "~/hooks/useRequestAnimationFrame";
 import {
   GravityUiCircles5Random,
   MaterialSymbolsDeleteOutline,
@@ -31,7 +32,6 @@ function Index() {
   const cars = useRef<Car[]>([]);
   const bestCar = useRef<Car>();
   const isRunning = useRef(true);
-  const requestId = useRef<number | null>(null);
 
   function addBest() {
     localStorage.setItem("bestBrain", JSON.stringify(BEST_NETWORK));
@@ -58,7 +58,7 @@ function Index() {
     localStorage.removeItem("bestBrain");
   }
 
-  useEffect(() => {
+  useRequestAnimationFrame(() => {
     const canvas = canvasRef.current!;
     const networkCanvas = networkCanvasRef.current!;
 
@@ -139,15 +139,10 @@ function Index() {
 
       networkCtx.lineDashOffset = -time / 50;
       Visualizer.drawNetwork(networkCtx, bestCar.current.brain!);
-      requestId.current = requestAnimationFrame(animate);
     }
 
-    requestId.current = requestAnimationFrame(animate);
-
-    return () => {
-      if (requestId.current) cancelAnimationFrame(requestId.current);
-    };
-  }, []);
+    return animate;
+  });
 
   return (
     <div className="flex size-full justify-center gap-x-4 bg-gray-100">
